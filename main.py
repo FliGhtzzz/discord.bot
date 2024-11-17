@@ -1,19 +1,16 @@
-import discord
-import random
 import google.generativeai as genai
-import traceback
-import typing
-import os
-import datetime
 import time
-import requests
-#import keep_alive
-from discord.ext import tasks, commands
-intents = discord.Intents.all()
+import discord
+from discord.ext import commands
+from discord import app_commands
+
+
+intents = discord.Intents.default()
 intents.message_content = True
-channelid = []
-bot = discord.Bot(command_prefix='!', intents=intents)
 intents.members = True
+bot = commands.Bot(command_prefix='!', intents=intents)
+intents.members = True
+channelid = []
 #*******************************************
 #*******************************************
 #*******************************************
@@ -146,19 +143,19 @@ async def on_member_join(member):
 '''
 指令區  
 '''#@bot.hybrid_command
-@bot.slash_command(name="repeat",description="repeat text")
-async def test(interaction: discord.Interaction, text: str):    
-    await interaction.response.send_message(f'{text}')
+@bot.tree.command(name="repeat",description="repeat text")
+async def repeat(interaction: discord.Interaction, text: str):    
+    await interaction.response.send_message(text)
 
 #*******************************************
 
-@bot.slash_command(name="version",description="tell you the bots' version")
+@bot.tree.command(name="version",description="tell you the bots' version")
 async def cmd(interaction: discord.Interaction):
     await interaction.response.send_message('0.0.3, update the AI system', ephemeral=True)
 
 #*******************************************
     
-@bot.slash_command(name="userinfo",description="check user's info")
+@bot.tree.command(name="userinfo",description="check user's info")
 async def userinfo(interaction: discord.Interaction, user: discord.User):
     user_id = user.id
     avatar = user.display_avatar.url
@@ -173,7 +170,7 @@ async def userinfo(interaction: discord.Interaction, user: discord.User):
 #*******************************************
     
     
-@bot.slash_command(name="time",description="check time")
+@bot.tree.command(name="time",description="check time")
 async def userinfo(interaction: discord.Interaction):
     t = time.time()
     t1 = time.localtime(t)
@@ -182,7 +179,7 @@ async def userinfo(interaction: discord.Interaction):
 
 #*******************************************
 
-@bot.slash_command(name="questoai",description="以問句問AI問題")
+@bot.tree.command(name="questoai",description="以問句問AI問題")
 async def userinfo(interaction: discord.Interaction, text: str):
     await interaction.defer()
     response = await call_ai(text)
@@ -190,7 +187,7 @@ async def userinfo(interaction: discord.Interaction, text: str):
 
 #*******************************************
 
-@bot.slash_command(name="唬爛作文產生器",description="產生作文")
+@bot.tree.command(name="唬爛作文產生器",description="產生作文")
 async def userinfo(interaction: discord.Interaction, text: str):
     await interaction.defer()
     response = await call_ai2(text)
@@ -198,7 +195,7 @@ async def userinfo(interaction: discord.Interaction, text: str):
 
 #*******************************************
 
-@bot.slash_command(name="翻譯",description="翻譯各國語言成你想翻譯的語言")
+@bot.tree.command(name="翻譯",description="翻譯各國語言成你想翻譯的語言")
 async def userinfo(interaction: discord.Interaction, text: str, 語言: str):
     await interaction.defer()
     response = await call_ai3(text, 語言)
@@ -206,7 +203,7 @@ async def userinfo(interaction: discord.Interaction, text: str, 語言: str):
 
 #*******************************************
 
-@bot.slash_command(name="welset",description="set a welcome channel")
+@bot.tree.command(name="welset",description="set a welcome channel")
 async def welset(interaction: discord.Interaction, channel: discord.TextChannel):
     global channelid
     channelid.append(channel.id)
@@ -223,7 +220,7 @@ class ButtonView(discord.ui.View):
     async def button_callback(self, button, interation):
         await interation.response.send_message("收到你的點擊")
         
-@bot.slash_command(name="按鈕產生器")
+@bot.tree.command(name="按鈕產生器")
 async def click_click(interaction: discord.Interaction):
     await interaction.response.send_message('生出了一個按鈕', view=ButtonView())
 

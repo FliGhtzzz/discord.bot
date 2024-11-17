@@ -1,0 +1,29 @@
+name: Deploy Discord Bot
+
+on:
+  push:
+    branches:
+      - main  # 您可以根據需要更改分支名稱
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'  # 您可以根據需要選擇其他版本
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # 如果有 requirements.txt，請確保在項目根目錄中
+          
+      - name: Run Discord Bot
+        run: |
+          python main.py
+        env:
+          DISCORD_TOKEN: ${'MTE4ODQyMDk4MzA2MTc1ODAwMg.G_gusQ.5MPGnppPcUX7zOwvb1F8jWWJMEYMoeN3CdaFpg'}  # 使用 GitHub Secrets 存儲 Discord Bot Token
