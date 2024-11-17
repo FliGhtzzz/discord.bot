@@ -218,9 +218,8 @@ class ButtonView(discord.ui.View):
         super().__init__(timeout=timeout)
 
     @discord.ui.button(label="點擊", style=discord.ButtonStyle.primary)
-    async def button_callback(self, button: discord.ui.Button, interaction: discord.Interaction):
-        # 確保使用 interaction 來發送消息，而非 button
-        await interaction.response.send_message("收到你的點擊")
+    async def button_callback(self, button, interaction):  # 確保這裡的參數是 interaction
+        await interaction.response.send_message("收到你的點擊")  # 使用 interaction 的 response
 
 @bot.tree.command(name="按鈕產生器")
 async def click_click(interaction: discord.Interaction):
