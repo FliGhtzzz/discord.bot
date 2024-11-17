@@ -212,18 +212,18 @@ async def welset(interaction: discord.Interaction, channel: discord.TextChannel)
 
 
 #*******************************************
-    
+
 class ButtonView(discord.ui.View):
     def __init__(self, *, timeout=180):
-            super().__init__(timeout=timeout)
+        super().__init__(timeout=timeout)
+
     @discord.ui.button(label="點擊", style=discord.ButtonStyle.primary)
-    async def button_callback(self, button, interation):
-        await interation.response.send_message("收到你的點擊")
-        
+    async def button_callback(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await interaction.response.send_message("收到你的點擊")
+
 @bot.tree.command(name="按鈕產生器")
 async def click_click(interaction: discord.Interaction):
     await interaction.response.send_message('生出了一個按鈕', view=ButtonView())
-
 
 
 #keep_alive.keep_alive()
