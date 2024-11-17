@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main  # 您可以根據需要更改分支名稱
+concurrency:
+  group: "deploy-discord-bot"
+  cancel-in-progress: true  # 這個設置會取消當前的工作流程，並在有新的提交時重新運行
 
 jobs:
   deploy:
