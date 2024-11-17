@@ -25,7 +25,7 @@ jobs:
           python -m pip install --upgrade pip 
           pip install google
           pip install google-generativeai
-          pip install discor
+          pip install discord
           pip install --upgrade discord.py
           
       - name: Run Discord Bot
