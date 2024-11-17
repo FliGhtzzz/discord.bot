@@ -1,6 +1,7 @@
 import google.generativeai as genai
 import time
 import discord
+from discord import ui, ButtonStyle
 from discord.ext import commands
 from discord import app_commands
 
@@ -181,7 +182,7 @@ async def userinfo(interaction: discord.Interaction):
 
 @bot.tree.command(name="questoai",description="以問句問AI問題")
 async def userinfo(interaction: discord.Interaction, text: str):
-    await interaction.defer()
+    await interaction.response.defer()
     response = await call_ai(text)
     await interaction.followup.send(f"你的問題是{text},這是回答:\n{response}")
 
@@ -189,7 +190,7 @@ async def userinfo(interaction: discord.Interaction, text: str):
 
 @bot.tree.command(name="唬爛作文產生器",description="產生作文")
 async def userinfo(interaction: discord.Interaction, text: str):
-    await interaction.defer()
+    await interaction.response.defer()
     response = await call_ai2(text)
     await interaction.followup.send(response)
 
@@ -197,7 +198,7 @@ async def userinfo(interaction: discord.Interaction, text: str):
 
 @bot.tree.command(name="翻譯",description="翻譯各國語言成你想翻譯的語言")
 async def userinfo(interaction: discord.Interaction, text: str, 語言: str):
-    await interaction.defer()
+    await interaction.response.defer()
     response = await call_ai3(text, 語言)
     await interaction.followup.send(text+f"的{語言}翻譯是{response}")
 
@@ -213,20 +214,18 @@ async def welset(interaction: discord.Interaction, channel: discord.TextChannel)
 
 #*******************************************
 
-import discord
 
 class ButtonView(discord.ui.View):
     def __init__(self, *, timeout=180):
         super().__init__(timeout=timeout)
 
     @discord.ui.button(label="點擊", style=discord.ButtonStyle.primary)
-    async def button_callback(self, button: discord.ui.Button, interaction: discord.Interaction):
-        # 確保這裡傳遞的是 interaction，並用它來發送訊息
-        await interaction.response.send_message("收到你的點擊")  # 使用 interaction 的 response
+    async def button_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("[? 好笑嗎](<https://reurl.cc/xpDDYL>)")
 
 @bot.tree.command(name="按鈕產生器")
 async def click_click(interaction: discord.Interaction):
-    await interaction.response.send_message('生出了一個按鈕', view=ButtonView())
+    await interaction.response.send_message('別點', view=ButtonView())
 
 
 

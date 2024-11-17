@@ -22,11 +22,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade discord.py 
+          python -m pip install --upgrade pip 
           pip install google
           pip install google-generativeai
-          pip install discord
+          pip install discor
+          pip install --upgrade discord.py
           
       - name: Run Discord Bot
         run: |
