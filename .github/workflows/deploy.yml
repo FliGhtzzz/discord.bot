@@ -3,10 +3,12 @@ name: Deploy Discord Bot
 on:
   push:
     branches:
-      - main  # 您可以根據需要更改分支名稱
+      - main  
+  schedule:
+      - cron: "0 */3 * * *"  # 每 6 小時執行一次
 concurrency:
   group: "deploy-discord-bot"
-  cancel-in-progress: true  # 這個設置會取消當前的工作流程，並在有新的提交時重新運行
+  cancel-in-progress: true  
 
 jobs:
   deploy:
