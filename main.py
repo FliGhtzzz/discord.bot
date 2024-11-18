@@ -4,7 +4,12 @@ import discord
 from discord import ui, ButtonStyle
 from discord.ext import commands
 from discord import app_commands
+import os
+from dotenv import load_dotenv
+GEMINI_TOKEN = os.getenv("GEMINI_TOKEN")
+DCBOT_TOKEN = os.getenv("DCBOT_TOKEN")
 
+load_dotenv() 
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -21,7 +26,7 @@ channelid = []
 #*******************************************
 
 async def call_ai3(ques:str, l:str):
-    genai.configure(api_key="AIzaSyByWYnaz8iPtve4b_Ew7j32G4FwjyR-tu4")
+    genai.configure(api_key=GEMINI_TOKEN)
     generation_config = {
     "temperature": 1,
     "top_p": 0.95,
@@ -40,7 +45,7 @@ async def call_ai3(ques:str, l:str):
     return response.text
 
 async def call_ai2(ques:str):
-    genai.configure(api_key="AIzaSyByWYnaz8iPtve4b_Ew7j32G4FwjyR-tu4")
+    genai.configure(api_key=GEMINI_TOKEN)
     generation_config = {
     "temperature": 1,
     "top_p": 0.95,
@@ -59,7 +64,7 @@ async def call_ai2(ques:str):
     return response.text
 
 async def call_ai(ques:str):
-    genai.configure(api_key="AIzaSyByWYnaz8iPtve4b_Ew7j32G4FwjyR-tu4")
+    genai.configure(api_key=GEMINI_TOKEN)
     generation_config = {
     "temperature": 1,
     "top_p": 0.95,
@@ -230,4 +235,4 @@ async def click_click(interaction: discord.Interaction):
 
 
 #keep_alive.keep_alive()
-bot.run('MTE4ODQyMDk4MzA2MTc1ODAwMg.G_gusQ.5MPGnppPcUX7zOwvb1F8jWWJMEYMoeN3CdaFpg')
+bot.run(DCBOT_TOKEN)
