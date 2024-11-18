@@ -193,11 +193,18 @@ async def userinfo(interaction: discord.Interaction, text: str):
 
 #*******************************************
 
-@bot.tree.command(name="唬爛作文產生器",description="產生作文")
-async def userinfo(interaction: discord.Interaction, text: str):
-    await interaction.response.defer()
-    response = await call_ai2(text)
-    await interaction.followup.send(response)
+@bot.tree.command(name="唬爛作文產生器")
+async def userinfo(interaction: discord.Interaction, 主題: str):
+    try:
+        await interaction.response.defer()
+        response = await call_ai2(主題)
+        await interaction.followup.send(response)
+    except Exception as e:
+        if not interaction.response.is_done():
+            await interaction.response.send_message("發生錯誤，請稍後再試", ephemeral=True)
+        else:
+            await interaction.followup.send("發生錯誤，請稍後再試", ephemeral=True)
+        print(f"Error in userinfo command: {str(e)}")
 
 #*******************************************
 
