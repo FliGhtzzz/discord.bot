@@ -1,21 +1,10 @@
-import discord
-from discord.ext import commands
-from discord import app_commands
+import os
+from dotenv import load_dotenv
 
-intents = discord.Intents.default()
-intents.message_content = True
-intents.members = True
+load_dotenv()  # 自動加載 .env 文件
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+GEMINI_TOKEN = os.getenv("GEMINI_TOKEN")
+DCBOT_TOKEN = os.getenv("DCBOT_TOKEN")
 
-@bot.event
-async def on_ready():
-    print(f'Logged in as {bot.user}')
-
-@bot.tree.command(name="repeat", description="Repeat the text")
-async def repeat(interaction: discord.Interaction, text: str):
-    await interaction.response.send_message(text)
-
-
-
-bot.run('MTE4ODQyMDk4MzA2MTc1ODAwMg.G_gusQ.5MPGnppPcUX7zOwvb1F8jWWJMEYMoeN3CdaFpg')
+print(f"Gemini Token: {GEMINI_TOKEN}")
+print(f"DCBot Token: {DCBOT_TOKEN}")

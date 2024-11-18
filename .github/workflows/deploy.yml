@@ -27,9 +27,10 @@ jobs:
           pip install google-generativeai
           pip install discord
           pip install --upgrade discord.py
+          pip install python-dotenv
           
-      - name: Run Discord Bot
-        run: |
-          python main.py
+      - name: Run bot
         env:
-          DISCORD_TOKEN: ${'MTE4ODQyMDk4MzA2MTc1ODAwMg.G_gusQ.5MPGnppPcUX7zOwvb1F8jWWJMEYMoeN3CdaFpg'}  # 使用 GitHub Secrets 存儲 Discord Bot Token
+          GEMINI_TOKEN: ${{ secrets.GEMINI_TOKEN }}
+          DCBOT_TOKEN: ${{ secrets.DCBOT_TOKEN }}
+        run: python main.py
