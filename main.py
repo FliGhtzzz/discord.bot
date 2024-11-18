@@ -8,7 +8,7 @@ import os
 from dotenv import load_dotenv
 GEMINI_TOKEN = os.getenv("GEMINI_TOKEN")
 DCBOT_TOKEN = os.getenv("DCBOT_TOKEN")
-
+genai.configure(api_key=GEMINI_TOKEN)
 load_dotenv() 
 
 intents = discord.Intents.default()
@@ -24,25 +24,20 @@ channelid = []
 事件區
 '''
 #*******************************************
+async def call_ai3(ques: str, l: str):
+    prompt = f"translate {ques} into {l}"
+    try:
+        response = genai.generate_text(
+            model="text-bison-001",  # 確保模型名稱正確
+            prompt=prompt,
+            temperature=1,
+            max_output_tokens=500
+        )
+        return response["candidates"][0]["output"]
+    except Exception as e:
+        print(f"AI 調用失敗: {e}")
+        return "翻譯失敗，請稍後再試。"
 
-async def call_ai3(ques:str, l:str):
-    genai.configure(api_key=GEMINI_TOKEN)
-    generation_config = {
-    "temperature": 1,
-    "top_p": 0.95,
-    "top_k": 64,
-    "max_output_tokens": 5000,
-    "response_mime_type": "text/plain",
-    }
-    model = genai.GenerativeModel(
-    model_name="gemini-1.5-pro",
-    generation_config=generation_config,
-    system_instruction=f"你是一位專業的翻譯助手,精通多種語言並擅長各類文本的翻譯工作。你的主要任務是協助用戶進行高質量的語言轉換,確保翻譯結果既準確又流暢。請遵循以下指南:仔細理解原文的含義和語境,確保翻譯能夠準確傳達原始信息。根據目標語言的語法規則和表達習慣進行翻譯,使譯文自然流暢。保持原文的風格和語氣,同時適應目標語言的文化背景。正確處理專業術語、成語、俚語和文化特定表達。在需要時提供多個翻譯選項,並解釋各選項的細微差別。注意處理不同語言之間的文化差異,必要時提供文化背景解釋。對於難以直接翻譯的概念或表達,提供恰當的意譯和解釋。保持一致性,特別是在處理長篇文本或技術文檔時。根據用戶的具體需求(如正式/非正式語體、技術/文學翻譯等),調整翻譯策略。提供翻譯建議和語言學習提示,幫助用戶提高語言能力。尊重版權,不翻譯受版權保護的完整作品。請記住,你的目標是提供準確、流暢且符合文化背景的翻譯,同時幫助用戶理解語言和文化的細微差別。保持專業、耐心,並隨時準備解答用戶的問題或澄清疑點。")
-    chat_session = model.start_chat(
-    history=[]
-    )
-    response = await chat_session.send_message_async(f"translate {ques} in to {l}")
-    return response.text
 
 async def call_ai2(ques:str):
     genai.configure(api_key=GEMINI_TOKEN)
