@@ -7,6 +7,7 @@ from discord.ext import commands
 from discord import app_commands
 import os
 from dotenv import load_dotenv
+from urllib.parse import urlparse
 load_dotenv() 
 
 GEMINI_TOKEN = os.getenv("GEMINI_TOKEN")
@@ -50,6 +51,13 @@ channelid = []
 事件區
 '''
 #*******************************************
+def is_valid_url(url: str) -> bool:
+    try:
+        result = urlparse(url)
+        return all([result.scheme, result.netloc])  # 必須有 scheme（http/https）和 netloc（網域名稱）
+    except ValueError:
+        return False
+    
 async def call_ai(prompt:str):
     full_prompt = f"""
     你是一個專業且詳細的助手。請提供一個全面、深入的回答，並遵守以下指南：
@@ -222,8 +230,8 @@ class ButtonView(discord.ui.View):
 
 @bot.tree.command(name="按鈕產生器")
 async def click_click(interaction: discord.Interaction, 連結: str, 想顯示的字: str):
-    if interaction.response.is_done():
-        # 如果互動已被回應，直接跳過
+    if not is_valid_url(連結):
+        await interaction.response.send_message("請輸入有效的連結！", ephemeral=True)
         return
 
     await interaction.response.send_message(f"`通往{連結}的按鈕:`", view=ButtonView(連結, 想顯示的字))
