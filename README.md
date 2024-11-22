@@ -11,5 +11,5 @@ flightzz's discord bot
 把環境&.env用好，放到github-plubic
 ### v 0.3.1 
 * AI更新 
-* prompt-redo
+* prompt-redo !
 * botton redo
