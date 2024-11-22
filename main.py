@@ -1,4 +1,4 @@
-
+import asyncio  # 添加這行導入
 import google.generativeai as genai
 import time
 import discord
@@ -10,15 +10,18 @@ from dotenv import load_dotenv
 from urllib.parse import urlparse
 load_dotenv() 
 
+
 GEMINI_TOKEN = os.getenv("GEMINI_TOKEN")
 DCBOT_TOKEN = os.getenv("DCBOT_TOKEN")
 genai.configure(api_key=GEMINI_TOKEN)
 generation_config = {
-    'temperature': 0.7,      # 控制隨機性，0-1之間
-    'top_p': 1,              # 控制輸出多樣性
-    'top_k': 64,             # 選擇最可能的詞彙
-    'max_output_tokens': 1999  # 最大輸出token數
+    'temperature': 0.7,
+    'top_p': 1,
+    'top_k': 64,
+    'max_output_tokens': 1999
 }
+
+# Updated safety settings for Gemini
 safety_settings = [
     {
         "category": "HARM_CATEGORY_HARASSMENT",
@@ -34,9 +37,12 @@ safety_settings = [
     },
     {
         "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-        "threshold": "BLOCK_NONE"  # 關閉危險內容的阻攔
+        "threshold": "BLOCK_NONE"
     }
 ]
+
+# Initialize the model once
+model = genai.GenerativeModel('gemini-pro')
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -51,6 +57,7 @@ channelid = []
 事件區
 '''
 #*******************************************
+
 def is_valid_url(url: str) -> bool:
     try:
         result = urlparse(url)
@@ -58,28 +65,39 @@ def is_valid_url(url: str) -> bool:
     except ValueError:
         return False
     
-async def call_ai(prompt:str):
-    full_prompt = f"""
-    你是一個專業且詳細的助手。請提供一個全面、深入的回答，並遵守以下指南：
+async def call_ai(prompt: str) -> str:
+    try:
+        # 整理提示詞
+        full_prompt = f"""
+        你是一個專業且詳細的助手。請提供一個全面、深入的回答，並遵守以下指南：
 
-    1. 盡可能詳細地回答問題
-    2. 提供豐富的上下文和解釋
-    3. 如果問題允許，給出多個視角或方法
-    4. 使用具體的例子來闡明觀點
-    5. 保持回答的結構性和邏輯性
+        1. 盡可能詳細地回答問題
+        2. 提供豐富的上下文和解釋
+        3. 如果問題允許，給出多個視角或方法
+        4. 使用具體的例子來闡明觀點
+        5. 保持回答的結構性和邏輯性
 
-    原始問題：{prompt}
+        原始問題：{prompt}
 
-    請開始你詳細的回答：
-    """
-    model = genai.GenerativeModel(
-    'gemini-pro',
-    generation_config=generation_config,
-    safety_settings=safety_settings
-    )
-    
-    response = model.generate_content(full_prompt)
-    return response.text
+        請開始你詳細的回答：
+        """
+
+        # 使用同步 API 並封裝為異步任務
+        loop = asyncio.get_event_loop()
+        model = genai.GenerativeModel(
+            model_name='gemini-pro',
+            generation_config=generation_config,
+            safety_settings=safety_settings
+        )
+        response = await loop.run_in_executor(
+            None,
+            lambda: model.generate_content(full_prompt)
+        )
+
+        # 返回生成的文本
+        return response.text
+    except Exception as e:
+        return f"AI 呼叫失敗：{str(e)}"
 #*******************************************
 
 @bot.event
@@ -180,7 +198,7 @@ async def userinfo(interaction: discord.Interaction, user: discord.User):
     
     
 @bot.tree.command(name="time",description="check time")
-async def userinfo(interaction: discord.Interaction):
+async def chktime(interaction: discord.Interaction):
     t = time.time()
     t1 = time.localtime(t)
     t2 = time.strftime('%Y/%m/%d %H:%M:%S',t1)
@@ -189,26 +207,39 @@ async def userinfo(interaction: discord.Interaction):
 #*******************************************
 
 @bot.tree.command(name="questoai",description="例如1+1=?，請以這種形式")
-async def userinfo(interaction: discord.Interaction, 想問的問題: str):
-    await interaction.response.defer()
-    response = await call_ai(想問的問題)
-    await interaction.followup.send(response)
+async def quesai(interaction: discord.Interaction, 想問的問題: str):
+    try:
+        # 先延遲回應，避免互動超時
+        await interaction.response.defer(thinking=True)
+
+        # 呼叫 AI（模擬較長時間處理）
+        response = await call_ai(想問的問題)
+
+        # 最後使用 follow-up 發送結果
+        await interaction.followup.send(response)
+    except Exception as e:
+        print(f"AI 呼叫失敗: {e}")
+        await interaction.followup.send("AI 回應失敗，請稍後再試。")
+
 
 #*******************************************
 
 @bot.tree.command(name="唬爛作文產生器")
 async def userinfo(interaction: discord.Interaction, 作文的主題: str):
-    await interaction.response.defer()
     response = await call_ai(f"以{作文的主題}生成一篇作文")
-    await interaction.followup.send(response)
-
+    if interaction.response.is_done():
+        await interaction.followup.send(response)
+    else:
+        await interaction.response.send_message(response)
 #*******************************************
 
 @bot.tree.command(name="翻譯",description="翻譯各國語言成你想翻譯的語言")
-async def userinfo(interaction: discord.Interaction, 原文: str, 語言: str):
-    await interaction.response.defer()
+async def translate(interaction: discord.Interaction, 原文: str, 語言: str):
     response = await call_ai(f"translate{原文} in to {語言}")
-    await interaction.followup.send(f"這是翻譯:\n{response}")
+    if interaction.response.is_done():
+        await interaction.followup.send(f"這是翻譯:\n{response}")
+    else:
+        await interaction.response.send_message(f"這是翻譯:\n{response}")
 
 #*******************************************
 
