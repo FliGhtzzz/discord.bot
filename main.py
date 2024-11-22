@@ -14,26 +14,20 @@ load_dotenv()
 GEMINI_TOKEN = os.getenv("GEMINI_TOKEN")
 DCBOT_TOKEN = os.getenv("DCBOT_TOKEN")
 genai.configure(api_key=GEMINI_TOKEN)
-generation_config = {
-    'temperature': 0.7,
-    'top_p': 1,
-    'top_k': 64,
-    'max_output_tokens': 1999
-}
 
 # Updated safety settings for Gemini
 safety_settings = [
     {
         "category": "HARM_CATEGORY_HARASSMENT",
-        "threshold": "BLOCK_ONLY_HIGH"
+        "threshold": "BLOCK_NONE"
     },
     {
         "category": "HARM_CATEGORY_HATE_SPEECH",
-        "threshold": "BLOCK_ONLY_HIGH"
+        "threshold": "BLOCK_NONE"
     },
     {
         "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        "threshold": "BLOCK_ONLY_HIGH"
+        "threshold": "BLOCK_NONE"
     },
     {
         "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
@@ -66,9 +60,7 @@ def is_valid_url(url: str) -> bool:
         return False
     
 async def call_ai(prompt: str) -> str:
-    try:
-        # 整理提示詞
-        full_prompt = f"""
+    full_prompt = f"""
         你是一個專業且詳細的助手。請提供一個全面、深入的回答，並遵守以下指南：
 
         1. 盡可能詳細地回答問題
@@ -81,23 +73,33 @@ async def call_ai(prompt: str) -> str:
 
         請開始你詳細的回答：
         """
+    try:
+        # 配置 Google API
+        model_name = "gemini-pro"  # 請確認這是正確的模型名稱
+        generation_config = {
+            "temperature": 0.7,
+            "top_p": 1,
+            "top_k": 40,
+            "max_output_tokens": 2000,
+        }
 
-        # 使用同步 API 並封裝為異步任務
-        loop = asyncio.get_event_loop()
+        # 創建 GenerativeModel 實例
         model = genai.GenerativeModel(
-            model_name='gemini-pro',
+            model_name=model_name,
             generation_config=generation_config,
-            safety_settings=safety_settings
-        )
-        response = await loop.run_in_executor(
-            None,
-            lambda: model.generate_content(full_prompt)
         )
 
-        # 返回生成的文本
-        return response.text
+        # 生成文本
+        response = model.generate_content(full_prompt)
+
+        # 回傳結果
+        return response.text if response and hasattr(response, "text") else "無法生成結果。"
+
+    except AttributeError as e:
+        return f"AI 呼叫失敗: 屬性錯誤 - {e}"
     except Exception as e:
-        return f"AI 呼叫失敗：{str(e)}"
+        return f"AI 呼叫失敗: {str(e)}"
+
 #*******************************************
 
 @bot.event
@@ -216,7 +218,7 @@ async def quesai(interaction: discord.Interaction, 想問的問題: str):
         response = await call_ai(想問的問題)
 
         # 最後使用 follow-up 發送結果
-        await interaction.followup.send(response)
+        await interaction.followup.send(f"根據你的問題:{想問的問題}\n-# 嗨 \n產生出了:\n{response}")
     except Exception as e:
         print(f"AI 呼叫失敗: {e}")
         await interaction.followup.send("AI 回應失敗，請稍後再試。")
