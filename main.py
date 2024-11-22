@@ -218,7 +218,7 @@ async def quesai(interaction: discord.Interaction, 想問的問題: str):
         response = await call_ai(想問的問題)
 
         # 最後使用 follow-up 發送結果
-        await interaction.followup.send(f"根據你的問題:{想問的問題}\n-# 嗨 \n產生出了:\n{response}")
+        await interaction.followup.send(f"根據你的問題:`{想問的問題}`\n-# 嗨 \n產生出了:\n{response}")
     except Exception as e:
         print(f"AI 呼叫失敗: {e}")
         await interaction.followup.send("AI 回應失敗，請稍後再試。")
